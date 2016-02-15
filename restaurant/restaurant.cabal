@@ -23,6 +23,8 @@ library
   build-depends:       base >=4.8 && <4.9
                      , cqrs
                      , uuid
+                     , data-default
+                     , containers
   hs-source-dirs:      src
   default-language:    Haskell2010
 

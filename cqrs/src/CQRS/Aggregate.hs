@@ -1,13 +1,18 @@
 {-#LANGUAGE TypeFamilies #-}
+{-#LANGUAGE MultiParamTypeClasses #-}
+{-#LANGUAGE ConstraintKinds #-}
 module CQRS.Aggregate where
+import Data.Default
+import Data.Sequence
 
-class Aggregate a where
+class Default a => DomainLogic a where
   data Command a
   data Event a
-  data Error a
+  process :: a -> Command a -> Seq (Event a)
 
-  process :: a -> Command a -> Either (Error a) (Event a)
-  apply :: a -> Event a -> a
-  
-  initial :: a
+class (DomainLogic a, Default a) => Projection a r  where
+  apply :: r -> Event a -> r
+
+type Aggregate a = Projection a a
+
 
