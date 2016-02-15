@@ -37,57 +37,6 @@ when_ c =
 
   
   
-{- 
- -
- - testThat $ do
- -  when_ (RegisterUser e)
- -  then_ (MailSent e)
- -  then_ (UserRegistered e)
- - testThat $ do
- -  given_ UserRegistered e
- -  when_ (RegisterUser e)
- -  then_ (UserAlreadyRegistered e)
- -}
-
-{-
-then_' :: (DomainLogic a, Eq (Event a), Show (Event a)) 
-       => Event a
-       -> AggregateSpec a
-then_' e = do
-  env <- get
-  case env of
-    (Environment []     []     a) ->
-      undefined  -- we have no events in the buffer. we should fail
-    (Environment (c:cs) []     a) -> do
-      let res = process a c
-      put $ Environment cs res a
-      then_' e
-    (Environment []     (e':es) a) -> do
-      if e' == e
-        then put $ Environment [] es (apply e a)
-        else liftIO $ assertFailure $ "expected event:" ++ show e ++ "\nbut got:" ++ show e'
-      let a' = apply a e
-      put $ Environment [] es a'
-    (Environment (c:cs) (e':es) a) -> undefined
-
-then_ :: (DomainLogic a, Eq (Event a), Show (Event a), Show (Error a))
-      => Event a
-      -> AggregateSpec a
-then_ e = do
-  env <- get
-  case uncons (_commands env) of
-    Just (c,cs) ->
-      case process (_aggregate env) c of
-        Fail err -> liftIO $ assertFailure $  "expected event: " ++ show e ++ "\nbut got error: " ++ show err
-        Emit e2 ->
-          if e == e2
-            then put (env { _commands = cs })
-            else liftIO $ assertFailure $ "expected event:" ++ show e ++ "\nbut got:" ++ show e2
-    Nothing ->
-      liftIO $ assertFailure $ "expected event: "  ++ show e ++ "\nbut it was never emitted"
-
-
--} 
 then_ :: (DomainLogic a, Eq (Event a), Show (Event a))
       => Event a
       -> AggregateSpec a
