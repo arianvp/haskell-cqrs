@@ -46,7 +46,7 @@ then_ e = do
     (e2 :< es) ->
       if e == e2
         then put (env { _events = es })
-        else liftIO (assertFailure ("expected event:" ++ show e ++ "\n but got:" ++ show e2 ))
+        else liftIO (assertFailure ("expected event: " ++ show e ++ "\n but got: " ++ show e2 ))
     EmptyL ->
       liftIO (assertFailure ("expected event: " ++ show e ++ "\n but it was never emitted"))
 
